@@ -5,5 +5,6 @@ import { HttpApiController } from './http-api.controller';
 @Module({
   controllers: [HttpApiController],
   providers: [HttpApiService],
+  exports: [HttpApiService],
 })
 export class HttpApiModule {}
