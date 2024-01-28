@@ -1,3 +1,7 @@
+receive data from MQTT and send it to thinkspeak
+Link thinkspeak: https://thingspeak.com/channels/2323147/private_show (account: )
+Link wokwi: (version2)
+
 <p align="center">
   <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="200" alt="Nest Logo" /></a>
 </p>
