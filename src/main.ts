@@ -5,7 +5,6 @@ import { AppModule } from './app.module';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-  await app.listen(3000);
 
   // const mqttApp = await NestFactory.createMicroservice<MqttModule>(MqttModule, {
   //   transport: Transport.MQTT,
@@ -14,5 +13,13 @@ async function bootstrap() {
   //   },
   // });
   // await mqttApp.listen();
+
+  app.enableCors({
+    // origin: 'http://54.179.238.121:3000',
+    origin: '*',
+    methods: ['GET', 'HEAD', 'PUT', 'POST', 'PATCH', 'DELETE'],
+    allowedHeaders: '*',
+  });
+  await app.listen(3000);
 }
 bootstrap();

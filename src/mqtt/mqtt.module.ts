@@ -3,6 +3,9 @@ import { MqttService } from './mqtt.service';
 import { MqttController } from './mqtt.controller';
 import { ClientsModule, Transport } from '@nestjs/microservices';
 import { HttpApiModule } from 'src/http-api/http-api.module';
+import { UsersModule } from 'src/users/users.module';
+import { User, UserSchema } from 'src/users/schemas/user.schema';
+import { MongooseModule } from '@nestjs/mongoose';
 
 @Module({
   imports: [
@@ -15,7 +18,9 @@ import { HttpApiModule } from 'src/http-api/http-api.module';
         },
       },
     ]),
+    MongooseModule.forFeature([{ name: User.name, schema: UserSchema }]),
     HttpApiModule,
+    UsersModule,
   ],
   controllers: [MqttController],
   providers: [MqttService],

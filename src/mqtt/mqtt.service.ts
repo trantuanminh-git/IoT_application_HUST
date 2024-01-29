@@ -26,18 +26,26 @@
 // }
 // =========================================================================
 import { Injectable, OnModuleInit } from '@nestjs/common';
+import { InjectModel } from '@nestjs/mongoose';
+import { Model } from 'mongoose';
 // import { ConfigService } from '@nestjs/config';
 // import { connect } from 'mqtt';
 // import { debug, error, info } from 'ps-logger';
 import mqtt from 'mqtt';
 import { HttpApiService } from 'src/http-api/http-api.service';
+import { User } from 'src/users/schemas/user.schema';
+import { UsersService } from 'src/users/users.service';
 
 @Injectable()
 export class MqttService implements OnModuleInit {
   private mqttClient;
-  constructor(private httpApiService: HttpApiService) {}
+  constructor(
+    private httpApiService: HttpApiService,
+    private usersService: UsersService,
+    @InjectModel(User.name) private userModel: Model<User>,
+  ) {}
 
-  onModuleInit() {
+  async onModuleInit() {
     // const host = this.configService.get<string>('host');
     // const port = this.configService.get<string>('port');
     // const clientId = `mqtt_${Math.random().toString(16).slice(3)}`;
@@ -133,11 +141,9 @@ export class MqttService implements OnModuleInit {
       });
     });
 
-    client.on('message', async (topic, payload) => {
-      // console.log('Received Message:', topic, payload.toString())
+    const user = await this.userModel.findOne({ email: 'minh2@gmail.com' });
 
-      // convert payload to json
-      // console.log(payload.toString())
+    client.on('message', async (topic, payload) => {
       const data_object = payload.toString();
       // console.log(typeof data_object); // Nếu kết quả không phải là "string", thì payload không phải là chuỗi
 
@@ -148,6 +154,28 @@ export class MqttService implements OnModuleInit {
         noise: data_string[2],
         lux: data_string[3],
       };
+
+      const handleSaveData = async () => {
+        const data_json_number = {
+          temperature: +data_json.temperature,
+          humidity: +data_json.humidity,
+          noise: +data_json.noise,
+          lux: +data_json.lux,
+          time: new Date().toLocaleString(),
+        };
+        const isDataJsonNumberValid =
+          data_json_number.temperature &&
+          data_json_number.humidity &&
+          data_json_number.noise &&
+          data_json_number.lux;
+        if (isDataJsonNumberValid) {
+          user?.data.push(data_json_number);
+          await user.save();
+        }
+      };
+
+      handleSaveData();
+
       await this.httpApiService.getData_query(
         +data_json.temperature,
         +data_json.humidity,
