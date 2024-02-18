@@ -21,6 +21,7 @@ export class User {
       humidity: number;
       noise: number;
       lux: number;
+      quality: string;
       time: string;
     },
   ];

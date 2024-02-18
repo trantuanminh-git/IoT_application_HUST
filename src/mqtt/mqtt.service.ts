@@ -58,12 +58,27 @@ export class MqttService implements OnModuleInit {
       console.log('data_object,...', data_object);
       // console.log(typeof data_object); // Nếu kết quả không phải là "string", thì payload không phải là chuỗi
 
+      if (data_object === '0 - bad' || '1 - good') {
+        const data_report = data_object.split('-')[1];
+        const data_json_report = {
+          temperature: +'',
+          humidity: +'',
+          noise: +'',
+          lux: +'',
+          quality: data_report,
+          time: new Date().toLocaleString(),
+        };
+        user?.data.push(data_json_report);
+        await user.save();
+      }
+
       const data_string = data_object.split('-');
       const data_json = {
         temperature: data_string[0],
         humidity: data_string[1],
         noise: data_string[2],
         lux: data_string[3],
+        quality: data_string[4],
       };
 
       const handleSaveData = async () => {
@@ -72,6 +87,7 @@ export class MqttService implements OnModuleInit {
           humidity: +data_json.humidity,
           noise: +data_json.noise,
           lux: +data_json.lux,
+          quality: '',
           time: new Date().toLocaleString(),
         };
         const isDataJsonNumberValid =
